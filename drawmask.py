@@ -35,11 +35,11 @@ if bg_image:
 
 if canvas_result:
     st.markdown('mask')
-    mask = canvas_result.image_data.transpose(2,0,1)[0]
-
-    st.image(canvas_result.image_data.transpose(2,0,1)[0])
-
-    print(np.sum(mask))
+    try:
+        mask = canvas_result.image_data.transpose(2,0,1)[0]
+        st.image(mask)
+    except:
+        pass
 
 #if np.sum(mask):
 #    pass
