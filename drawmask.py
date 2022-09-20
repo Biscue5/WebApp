@@ -81,6 +81,7 @@ def inpainting_image(image, mask, steps=30):
 
 col1, col2 = st.beta_columns(2)
 
+
 drawing_mode = "freedraw"
 canvas_result = None
 
