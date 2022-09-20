@@ -1,3 +1,4 @@
+from curses import use_default_colors
 import pandas as pd
 from PIL import Image
 import streamlit as st
@@ -78,13 +79,16 @@ def inpainting_image(image, mask, steps=30):
 
     return inpainted
 
+col1, col2 = st.beta_columns(2)
 
 drawing_mode = "freedraw"
 canvas_result = None
 
 stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 11)
 stroke_color = '#ffffff' #white
-bg_image = st.file_uploader("Background image:", type=['jpg', 'jpeg', 'png'])
+with col1:
+    st.header('Input Image')
+    bg_image = st.file_uploader("Background image:", type=['jpg', 'jpeg', 'png'], use_column_width=True)
 
 if bg_image:
     img = Image.open(bg_image)
@@ -109,11 +113,12 @@ if bg_image:
     )
 
 if canvas_result:
-    st.markdown('mask')
     try:
         mask = canvas_result.image_data.transpose(2,0,1)[0]
         mask = Image.fromarray(mask)
-        st.image(mask)
+        with col2:
+            st.header('Masked Region')
+            st.image(mask, use_column_width=True)
 
         if st.button('generate', key=1):
             with st.spinner('Generating'):
@@ -122,7 +127,7 @@ if canvas_result:
             st.markdown('Generated Image')
             inpainted_img = Image.fromarray(inpainted_img.astype(np.uint8))
             inpainted_img = inpainted_img.resize((width, height))
-            st.image(inpainted_img)
+            st.image(inpainted_img, use_column_width=True)
             
     except:
         pass
