@@ -2,7 +2,13 @@ from PIL import Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
+import urllib.request
 
+url = 'https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1'
+
+with urllib.request.urlopen(url) as u:
+    with open('model/ldm/inpainting_big/last.ckpt', 'bw') as l:
+        l.write(u.read())
 
 
 from omegaconf import OmegaConf
