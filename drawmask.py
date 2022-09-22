@@ -1,9 +1,9 @@
-from curses import use_default_colors
-import pandas as pd
 from PIL import Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
+
+
 
 from omegaconf import OmegaConf
 from PIL import Image
@@ -45,6 +45,7 @@ def inpainting_image(image, mask, steps=30):
     model = instantiate_from_config(config.model)
     model.load_state_dict(torch.load("models/ldm/inpainting_big/last.ckpt")["state_dict"],
                           strict=False)
+
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
