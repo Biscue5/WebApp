@@ -1,21 +1,19 @@
+from urllib.parse import urldefrag
 from PIL import Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
-import urllib.request
+import requests
 
 url = 'https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1'
+urlData = requests.get(url).content
 
-with urllib.request.urlopen(url) as u:
-    with open('model/ldm/inpainting_big/last.ckpt', 'bw') as l:
-        l.write(u.read())
-
+with open('model/ldm/inpainting_big/last.ckpt', 'wb') as f:
+    f.write(urlData)
 
 from omegaconf import OmegaConf
 from PIL import Image
 import torch
-from torchvision.transforms import Compose, ToTensor, Lambda
-from torchvision.transforms import ToPILImage, CenterCrop, Resize
 from main import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 
