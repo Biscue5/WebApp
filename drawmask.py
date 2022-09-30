@@ -8,8 +8,9 @@ import requests
 url = 'https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1'
 urlData = requests.get(url).content
 
-with open('model/ldm/inpainting_big/last.ckpt', 'wb') as f:
-    f.write(urlData)
+with st.spinner('Downloading model...'):
+    with open('model/ldm/inpainting_big/last.ckpt', 'wb') as f:
+        f.write(urlData)
 
 from omegaconf import OmegaConf
 from PIL import Image

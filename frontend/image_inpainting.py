@@ -8,43 +8,6 @@ from torchvision.transforms import Compose, ToTensor, Lambda
 from torchvision.transforms import ToPILImage, CenterCrop, Resize
 from main import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
-'''
-def transformer(img, is_mask, img_size=256):
-    
-    if is_mask:
-        transform = Compose([Resize((img_size, img_size)),
-                             ToTensor(),
-                             Lambda(lambda t: t.to(torch.float32) / 255)
-                             ])
-    else:
-        transform = Compose([Resize((img_size, img_size)),
-                             ToTensor(),
-                             Lambda(lambda t: t.to(torch.float32) / 255)
-                             ])
-    return transform(img)
-
-def make_batch(image, mask, device):
-    image = Image.open(image).convert('RGB')
-    image = transformer(image, is_mask=None)
-    image = image[None]
-    print(image.shape)
-
-    mask = Image.open(mask).convert('L')
-    mask = transformer(mask, is_mask=True).squeeze()
-    mask = mask[None,None]
-
-    print(mask.shape)
-
-    masked_image = (1-mask)*image
-
-    batch = {"image": image, "mask": mask, "masked_image": masked_image}
-    
-    for k in batch:
-        batch[k] = batch[k].to(device=device)
-        batch[k] = batch[k]*2.0-1.0
-    
-    return batch
-'''
 
 def make_batch(image, mask, device, img_size=512):
     image = Image.open(image).convert("RGB")
