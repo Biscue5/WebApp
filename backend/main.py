@@ -1,9 +1,13 @@
-from fastapi import FastAPI
+from email import base64mime
+from re import U
+from fastapi import FastAPI, UploadFile, File
+from typing import List
 from fastapi.middleware.cors import CORSMiddleware
-from urllib.parse import urldefrag
 from PIL import Image
+import io
 import numpy as np
 import requests
+import base64
 from omegaconf import OmegaConf
 from PIL import Image
 import torch
@@ -11,14 +15,7 @@ from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 
 app = FastAPI()
-origins = ['http://localhost:3000']
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 def make_batch(image, mask, device, img_size=512):
     image = image.convert("RGB")
     image = image.resize((img_size, img_size))
@@ -41,8 +38,7 @@ def make_batch(image, mask, device, img_size=512):
         batch[k] = batch[k]*2.0-1.0
     return batch
 
-@app.get("/")
-def inpainting_image(image, mask, steps=30):
+def inpaintin_image(image, mask, steps=2):
     config = OmegaConf.load("models/ldm/inpainting_big/config.yaml")
     model = instantiate_from_config(config.model)
     model.load_state_dict(torch.load("models/ldm/inpainting_big/last.ckpt")["state_dict"],
@@ -73,4 +69,21 @@ def inpainting_image(image, mask, steps=30):
                                             min=0.0, max=1.0)
             inpainted = (1-mask)*image+mask*predicted_image
             inpainted = inpainted.cpu().numpy().transpose(0,2,3,1)[0]*255
+            inpainted = Image.fromarray(inpainted.astype(np.uint8))
+
     return inpainted
+
+@app.post("/predict/")  
+async def inpainting_img(files: List[UploadFile] = File(...)):
+    img = Image.open(io.BytesIO(files[0].file.read()))
+    mask = Image.open(io.BytesIO(files[1].file.read()))
+
+    inpainted_img = inpaintin_image(img, mask)
+
+    with io.BytesIO() as output:
+        inpainted_img.save(output, format='PNG')
+        bytes_inpinted_img = output.getvalue()
+        bytes_inpinted_img = base64.b64encode(bytes_inpinted_img)    
+
+    return bytes_inpinted_img
+
